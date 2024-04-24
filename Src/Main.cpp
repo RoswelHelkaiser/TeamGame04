@@ -5,10 +5,7 @@
 #include "Scene/Scene.h"
 #include "Scene/Title/SceneTitle.h"
 #include "Scene/Play/ScenePlay.h"
-<<<<<<< Updated upstream
-=======
 #include "Scene/Result/SceneResult.h"
->>>>>>> Stashed changes
 
 // define
 #define	SCREEN_SIZE_X	1280	// X方向の画面サイズを指定
@@ -130,10 +127,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 				case SCENE_ID_LOOP_TITLE:
 				{
-					//タイトル初期化
-					title.Init();
-					title.Load();
-					title.Sound();
+					//タイトル描画処理
+					title.Draw();
+					//タイトル通常処理
+					title.Step();
 
 				}//SCENE_ID_LOOP_TITLEの終わりの括弧
 				break;

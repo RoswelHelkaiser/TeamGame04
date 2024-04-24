@@ -50,14 +50,14 @@ void TITLE::Draw()
 	//メインタイトル
 	DrawRotaGraph(640, 150, 1.0f, 0.0f, ImageHandle[1], true);
 	//サブタイトル
-	DrawRotaGraph(640, 250, 1.0f, 0.0f, ImageHandle[2], true);
+	DrawRotaGraph(640, 350, 1.0f, 0.0f, ImageHandle[2], true);
 	//スタート
-	DrawRotaGraph(640, 500, 1.0f, 0.0f, ImageHandle[3], true);
+	DrawRotaGraph(640, 550, 1.0f, 0.0f, ImageHandle[3], true);
 
 	if (IsKeyPush(KEY_INPUT_RETURN))
 	{
 		//タイトル後処理へ移動
-		g_CurrentSceneID = SCENE_ID_LOOP_TITLE;
+		g_CurrentSceneID = SCENE_ID_FIN_TITLE;
 	}
 }
 
