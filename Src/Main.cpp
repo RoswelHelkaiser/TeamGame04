@@ -3,10 +3,9 @@
 #include "DxLib.h"	//DXライブラリのインクルード
 #include "Common.h"
 #include "Scene/Scene.h"
-#include "Scene/SceneTitle.h"
-#include "Scene/ScenePlay.h"
-#include "Scene/SceneClear.h"
-#include "Scene/SceneGameOver.h"
+#include "Scene/Title/SceneTitle.h"
+#include "Scene/Play/ScenePlay.h"
+#include "Scene/Clear/SceneClear.h"
 
 // define
 #define	SCREEN_SIZE_X	1280	// X方向の画面サイズを指定
@@ -162,7 +161,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				}//SCENE_ID_FIN_PLAYの終わりの括弧
 				break;
 
-				//クリアシーン(高松)
+				//クリアシーン
 				case SCENE_ID_INIT_CLEAR:
 				{
 					//クリア画面初期化
@@ -189,35 +188,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 				}//SCENE_ID_FIN_CLEARの終わりの括弧
 				break;
-
-				//ゲームオーバーシーン担当宮近
-				case SCENE_ID_INIT_GAMEOVER:
-				{
-					//ゲームオーバー画面初期化
-					InitGameOver();
-
-				}//SCENE_ID_INIT_GAMEOVERの終わりの括弧
-				break;
-
-				case SCENE_ID_LOOP_GAMEOVER:
-				{
-					//ゲームオーバー画面通常処理
-					StepGameOver();
-
-					//ゲームオーバー画面描画処理
-					DrawGameOver();
-
-				}//SCENE_ID_LOOP_GAMEOVERの終わりの括弧
-				break;
-
-				case SCENE_ID_FIN_GAMEOVER:
-				{
-					//ゲームオーバー画面後処理
-					FinGameOver();
-
-				}//SCENE_ID_FIN_GAMEOVERの終わりの括弧
-				break;
-
 			}//シーン振り分けのswitch文の終わりの括弧
 
 			//FPS計算
