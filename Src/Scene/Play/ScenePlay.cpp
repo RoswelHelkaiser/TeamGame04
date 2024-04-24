@@ -3,6 +3,8 @@
 #include "ScenePlay.h"
 #include "../../Common.h"
 
+#define NUM_DANGO_PATH "Data/Dango/dango1"
+
 //=============================
 // プレイシーン
 //=============================
@@ -10,6 +12,7 @@
 //初期化
 void PLAY::Init()
 {
+	m_numhndl = 0;
 
 	//プレイループへ
 	g_CurrentSceneID = SCENE_ID_LOOP_PLAY;
@@ -18,7 +21,7 @@ void PLAY::Init()
 //ロード
 void PLAY::Load()
 {
-
+	m_numhndl = LoadGraph(NUM_DANGO_PATH);
 }
 
 void PLAY::Sound()
@@ -42,7 +45,7 @@ void PLAY::Step()
 //描画処理
 void PLAY::Draw()
 {
-
+	DrawGraph(600, 600, m_numhndl, true);
 }
 
 //後処理
