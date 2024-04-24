@@ -17,7 +17,8 @@ enum SCENE_ID
 	SCENE_ID_INIT_RESULT = 300,
 	SCENE_ID_LOOP_RESULT,
 	SCENE_ID_FIN_RESULT,
-}
+};
+
 //シーンベースクラス
 class SCENE_BASE
 {
