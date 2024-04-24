@@ -8,7 +8,6 @@
 #include "../Result/SceneResult.h"
 #include "../../Effect/Effect.h"
 
-
 //プレイシーンクラス
 class PLAY : public SCENE_BASE
 {
@@ -34,4 +33,3 @@ public:
 	void Fin() override;
 
 };
-

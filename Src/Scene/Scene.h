@@ -44,5 +44,4 @@ class SCENE_BASE
 };
 
 //Œ»İ‚ÌƒV[ƒ“ID
-
 extern int g_CurrentSceneID;

@@ -1,14 +1,13 @@
 #pragma once
 #include "../Scene.h"
 
-
 //タイトルクラス
 class TITLE : public SCENE_BASE 
 {
-private:
-	
+	private:
+		int ImageHandle[4];	//画像ハンドル
 
-public:
+	public:
 
 	//初期化
 	void Init() override;
@@ -23,6 +22,4 @@ public:
 
 	//音楽を流すだけの処理
 	void Sound();
-
 };
-

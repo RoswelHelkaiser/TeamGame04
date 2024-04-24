@@ -5,6 +5,10 @@
 #include "Scene/Scene.h"
 #include "Scene/Title/SceneTitle.h"
 #include "Scene/Play/ScenePlay.h"
+<<<<<<< Updated upstream
+=======
+#include "Scene/Result/SceneResult.h"
+>>>>>>> Stashed changes
 
 // define
 #define	SCREEN_SIZE_X	1280	// X方向の画面サイズを指定
