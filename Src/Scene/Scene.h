@@ -2,25 +2,24 @@
 #include "../Input/Input.h"
 #include "../Collision/Collision.h"
 
-//タイトル関連
-#define SCENE_ID_INIT_TITLE		(100)	//初期化
-#define SCENE_ID_LOOP_TITLE		(101)	//繰り返し
-#define SCENE_ID_FIN_TITLE		(102)	//後処理
+//シーンIDの種類
+enum SCENE_ID
+{
+	//タイトル関連
+	SCENE_ID_INIT_TITLE = 100,
+	SCENE_ID_LOOP_TITLE,
+	SCENE_ID_FIN_TITLE,
 
-//プレイ関連
-#define SCENE_ID_INIT_PLAY		(200)	//初期化
-#define SCENE_ID_LOOP_PLAY		(201)	//繰り返し
-#define SCENE_ID_FIN_PLAY		(202)	//後処理
+	//プレイ関連
+	SCENE_ID_INIT_PLAY = 200,
+	SCENE_ID_LOOP_PLAY,
+	SCENE_ID_FIN_PLAY,
 
-//クリア関連
-#define SCENE_ID_INIT_CLEAR		(300)	//初期化
-#define SCENE_ID_LOOP_CLEAR		(301)	//繰り返し
-#define SCENE_ID_FIN_CLEAR		(302)	//後処理
-
-//ゲームオーバー関連
-#define SCENE_ID_INIT_GAMEOVER	(400)	//初期化
-#define SCENE_ID_LOOP_GAMEOVER	(401)	//繰り返し
-#define SCENE_ID_FIN_GAMEOVER	(402)	//後処理
+	//ゲームクリア関連
+	SCENE_ID_INIT_RESULT = 300,
+	SCENE_ID_LOOP_RESULT,
+	SCENE_ID_FIN_RESULT,
+};
 
 //現在のシーンID
-extern int g_CurrentSceneID;
+extern SCENE_ID g_CurrentSceneID;
