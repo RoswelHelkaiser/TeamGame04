@@ -5,7 +5,6 @@
 #include "Scene/Scene.h"
 #include "Scene/Title/SceneTitle.h"
 #include "Scene/Play/ScenePlay.h"
-#include "Scene/Clear/SceneClear.h"
 
 // define
 #define	SCREEN_SIZE_X	1280	// X方向の画面サイズを指定
@@ -32,6 +31,14 @@ void DrawFPS();
 
 //現在のシーンID
 int g_CurrentSceneID = SCENE_ID_INIT_TITLE;
+
+//タイトルクラス宣言
+TITLE title;
+//プレイシーンクラス宣言
+PLAY play;
+//リザルトシーンクラス宣言
+RESULT result;
+
 
 // Win32アプリケーションは WinMain関数 から始まる
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -110,18 +117,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				case SCENE_ID_INIT_TITLE:
 				{
 					//タイトル初期化
-					InitTitle();
+					title.Init();
+					title.Load();
+					title.Sound();
 
 				}//SCENE_ID_INIT_TITLEの終わりの括弧
 				break;
 
 				case SCENE_ID_LOOP_TITLE:
 				{
-					//タイトル通常処理
-					StepTitle();
-
-					//タイトル描画処理
-					DrawTitle();
+					//タイトル初期化
+					title.Init();
+					title.Load();
+					title.Sound();
 
 				}//SCENE_ID_LOOP_TITLEの終わりの括弧
 				break;
@@ -129,66 +137,61 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				case SCENE_ID_FIN_TITLE:
 				{
 					//タイトル後処理
-					FinTitle();
+					title.Fin();
 
 				}//SCENE_ID_FIN_TITLEの終わりの括弧
 				break;
 
 				case SCENE_ID_INIT_PLAY:
 				{
-					//プレイシーン初期化
-					InitPlay();
+					//プレイ初期化  
+					play.Init();
+					play.Load();
+					play.Sound();
 
 				}//SCENE_ID_INIT_PLAYの終わりの括弧
 				break;
 
 				case SCENE_ID_LOOP_PLAY:
 				{
-					//プレイシーン通常処理
-					StepPlay();
-
-					//プレイシーン描画処理
-					DrawPlay();
+					//プレイ描画処理
+					play.Draw();
+					//プレイ通常処理
+					play.Step();
 
 				}//SCENE_ID_LOOP_PLAYの終わりの括弧
 				break;
 
 				case SCENE_ID_FIN_PLAY:
 				{
-					//プレイシーン後処理
-					FinPlay();
+					//プレイ後処理
+					play.Fin();
 
 				}//SCENE_ID_FIN_PLAYの終わりの括弧
 				break;
 
-				//クリアシーン
-				case SCENE_ID_INIT_CLEAR:
+				case SCENE_ID_INIT_RESULT:
 				{
-					//クリア画面初期化
-					InitClear();
+					//リザルト初期化  
+					
+					//リザルト読み込み
+					result.Load();
 
-				}//SCENE_ID_INIT_CLEARの終わりの括弧
-				break;
-
-				case SCENE_ID_LOOP_CLEAR:
+					result.Sound();
+				}   break;
+				case SCENE_ID_LOOP_RESULT:
 				{
-					//クリア画面通常処理
-					StepClear();
-
-					//クリア画面描画処理
-					DrawClear();
-
-				}//SCENE_ID_LOOP_CLEARの終わりの括弧
-				break;
-
-				case SCENE_ID_FIN_CLEAR:
+					//リザルト描画処理
+					result.Draw();
+					//リザルト通常処理
+					result.Step();
+				}	break;
+				case SCENE_ID_FIN_RESULT:
 				{
-					//クリア画面後処理
-					FinClear();
-
-				}//SCENE_ID_FIN_CLEARの終わりの括弧
-				break;
-			}//シーン振り分けのswitch文の終わりの括弧
+					//リザルト後処理
+					result.Fin();
+				}   break;
+			}//シーン振り分けのswitch文終了
 
 			//FPS計算
 			CalcFPS();

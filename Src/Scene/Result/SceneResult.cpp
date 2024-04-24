@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include "../../Input/Input.h"
 #include "../../Collision/Collision.h"
+#include "../Scene.h"
 
 //初期化
 void RESULT::Init(int m_score)
@@ -20,6 +21,15 @@ void RESULT::Sound()
 void RESULT::Step()
 {
 	
+	//タイトルシーンへの遷移
+	if (IsKeyPush(KEY_INPUT_RETURN) ){
+		//シーンフラグをタイトルシーンに変更
+		m_SceneFlag = 0;
+		//リザルト後処理へ移動
+		g_CurrentSceneID = SCENE_ID_FIN_RESULT;
+	}
+
+
 }
 
 //描画処理

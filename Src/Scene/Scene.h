@@ -68,4 +68,4 @@ enum SCENE_ID
 };
 //Œ»İ‚ÌƒV[ƒ“ID
 
-extern SCENE_ID g_CurrentSceneID;
+extern int g_CurrentSceneID;
