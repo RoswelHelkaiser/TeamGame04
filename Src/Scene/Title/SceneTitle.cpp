@@ -1,45 +1,124 @@
+
 #include "DxLib.h"
-#include "Scene.h"
 #include "SceneTitle.h"
+#include "../../Input/Input.h"
+#include "../../Transparent/Transparent.h"
+#include "../../Collision/Collision.h"
+#include "../../Transparent/Transparent.h"
 
-int BackImage;	//タイトル背景画像ハンドル
+//画像読み込み
+#define TITEL_BACK_PATH	"Data/Title/BackGround.png"
+#define TITEL_GROUND_PATH "Data/Title/ground.png"
+#define TITLE_PATH	"Data/Title/Title.png"
+#define TITLE_ENTER_PATH "Data/Title/Enter.png"
 
-int Start_BGM;	//BGMハンドル
+//=============================
+// タイトルシーン
+//=============================
 
-void InitTitle()	//タイトル初期化
+//初期化
+void TITLE::Init()
 {
-	BackImage = LoadGraph(BACK_PATH);	//タイトル背景画像読み込み
+	//ハンドルの初期化
+	m_BackHndl = 0;			//背景
+	m_GroundHndl = 0;		//地面
+	m_TitleHndl = 0;		//タイトル名
+	m_EnterHndl = 0;		//エンター
+	m_BGMHndl = -1;			//タイトル画面BGM
 
-	Start_BGM = LoadSoundMem(START_BGM_PATH);	//BGM読み込み
+	//地面のスライド用の変数の初期化
+	m_GroundPosX = 0;
+	m_GroundMaxPosX = 1280;
 
-	ChangeVolumeSoundMem(255 * 50 / 100, Start_BGM);	//BGMの音量を50%にする
+	//エンターの点滅用の変数の初期化
+	m_blink = 0;
+	
+	//プレイヤー初期化
+	c_player.Init();
+	c_player.DefaultValue();
 
-	PlaySoundMem(Start_BGM, DX_PLAYTYPE_LOOP, true);	//BGM再生
-
-	g_CurrentSceneID = SCENE_ID_LOOP_TITLE;	//タイトルループへ移動
+	//タイトルループへ
+	g_CurrentSceneID = SCENE_ID_LOOP_TITLE;
 }
 
-void StepTitle()	//タイトル通常処理
+//ロード
+void TITLE::Load()
 {
-	if (IsKeyPush(KEY_INPUT_RETURN))	//Enterキーが押されたら
+	m_BGMHndl = LoadSoundMem(TITLE_BGM);
+	m_BackHndl = LoadGraph(TITEL_BACK_PATH);
+	m_GroundHndl = LoadGraph(TITEL_GROUND_PATH);
+	m_TitleHndl = LoadGraph(TITLE_PATH);
+	m_EnterHndl = LoadGraph(TITLE_ENTER_PATH);
+
+	//プレイヤーロード
+	c_player.Load();
+}
+
+void TITLE::Sound()
+{
+	PlaySoundMem(m_BGMHndl, DX_PLAYTYPE_LOOP);
+}
+
+//通常処理
+void TITLE::Step()
+{
+	
+	//地面のスクロール
+	m_GroundPosX -= 4;
+	m_GroundMaxPosX -= 4;
+	if (m_GroundPosX <= -1280) {
+		m_GroundPosX = 1280;
+	}
+	if (m_GroundMaxPosX <= -1280) {
+		m_GroundMaxPosX = 1280;
+	}
+
+	m_blink = Transparent(m_blink, 1);
+
+	c_player.Step(0);
+
+	//メインメニューシーンへの遷移
+	//Enterキー押されたなら
+	if (IsKeyPush(KEY_INPUT_RETURN))
 	{
-		g_CurrentSceneID = SCENE_ID_FIN_TITLE;	//タイトル後処理へ移動
+		//シーンフラグをプレイシーンに変更
+		m_SceneFlag = 0;
+		//タイトル後処理へ移動
+		g_CurrentSceneID = SCENE_ID_FIN_TITLE;
+	}
+
+}
+
+//描画処理
+void TITLE::Draw()
+{
+	DrawGraph(0, 0, m_BackHndl, true);
+	DrawGraph(m_GroundPosX, 500, m_GroundHndl, true);
+	DrawGraph(m_GroundMaxPosX, 500, m_GroundHndl, true);
+	DrawGraph(300, 50, m_TitleHndl, true);
+	
+	//点滅処理（エンター）
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_blink);
+	DrawGraph(370, 350, m_EnterHndl, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, m_blink);
+
+	c_player.Draw(0);
+
+}
+
+//消去処理
+void TITLE::Fin()
+{
+	//削除
+	DeleteSoundMem(m_BGMHndl);
+
+	c_player.Fin();
+
+	//SceneFlagが0の時
+	if (m_SceneFlag == 0)
+	{
+		//INITへ移動
+		g_CurrentSceneID = SCENE_ID_INIT_PLAY;
 	}
 }
 
-void DrawTitle()	//タイトル描画処理
-{
-	DrawGraph(0, 0, BackImage, true);	//タイトル背景画像描画
-}
-
-//タイトル後処理
-void FinTitle()
-{
-	DeleteGraph(BackImage);	//タイトル背景画像破棄
-
-	StopSoundMem(Start_BGM);	//BGM停止
-
-	DeleteSoundMem(Start_BGM);	//BGM破棄
-
-	g_CurrentSceneID = SCENE_ID_INIT_PLAY;	//プレイシーンへ移動
-}

@@ -1,13 +1,43 @@
 #pragma once
+#include "../Scene.h"
+#include "../../Player/Player.h"
 
-#define BACK_PATH	("Data/TitleImage/BgTitle.png")	//タイトルの背景画像のパス
+const char TITLE_BGM[] = { "Data/Sound/Title/ks011.wav" };		//タイトル画面のBGM
 
-#define START_BGM_PATH	("Data/Sound/Music/TitleScreen.mp3")	//BGMのパス
+//タイトルクラス
+class TITLE : public SCENE_BASE 
+{
+private:
+	int m_BackHndl;
+	int m_GroundHndl;
+	int m_TitleHndl;
+	int m_EnterHndl;
+	int m_BGMHndl;
 
-void InitTitle();	//タイトル初期化
+	//地面のスライド用の変数
+	int m_GroundPosX;
+	int m_GroundMaxPosX;
 
-void StepTitle();	//タイトル通常処理
+	//エンターの点滅用の変数
+	int m_blink;
+	
 
-void DrawTitle();	//タイトル描画処理
+public:
+	Player c_player;
 
-void FinTitle();	//タイトル後処理
+	//初期化
+	void Init() override;
+	//ロード
+	void Load() override;
+	//通常処理
+	void Step()	override;
+	//描画処理
+	void Draw() override;
+	//後処理
+	void Fin() override;
+
+	//音楽を流すだけの処理
+	void Sound();
+
+};
+
