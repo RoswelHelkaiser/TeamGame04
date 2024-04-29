@@ -1,4 +1,8 @@
 #pragma once
+#include "DxLib.h"
+#include "../Collision/Collision.h"
+#include "../Common.h"
+#include "../Input/Input.h"
 
 //ƒV[ƒ“ID‚Ìí—Ş
 enum SCENE_ID

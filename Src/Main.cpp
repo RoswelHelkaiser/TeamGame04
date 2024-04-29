@@ -2,6 +2,7 @@
 
 #include "DxLib.h"	//DXライブラリのインクルード
 #include "Common.h"
+#include "Input/Input.h"
 #include "Scene/Scene.h"
 #include "Scene/Title/SceneTitle.h"
 #include "Scene/Play/ScenePlay.h"
@@ -60,6 +61,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//入力初期化
 	InitInput();
+
+	//マウスカーソルを表示する
+	SetMouseDispFlag(true);
 	
 	//-----------------------------------------
 	//一番最初に１回だけやる処理をここに書く
@@ -174,24 +178,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				case SCENE_ID_INIT_RESULT:
 				{
 					//リザルト初期化  
-					
+					result.Init();
+
 					//リザルト読み込み
 					result.Load();
 
 					result.Sound();
-				}   break;
+				}
+				break;
+
 				case SCENE_ID_LOOP_RESULT:
 				{
 					//リザルト描画処理
 					result.Draw();
 					//リザルト通常処理
 					result.Step();
-				}	break;
+				}
+				break;
+
 				case SCENE_ID_FIN_RESULT:
 				{
 					//リザルト後処理
 					result.Fin();
-				}   break;
+				}
+				break;
+
 			}//シーン振り分けのswitch文終了
 
 			//FPS計算
