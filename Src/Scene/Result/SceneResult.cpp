@@ -5,6 +5,29 @@ void RESULT::Init()
 {
 	BackHandle = 0;	//”wŒi‰æ‘œ‰Šú‰»
 
+	for (int i = 0; i < 2; i++)
+	{
+		TextHandle[i] = 0;	//•¶š‰æ‘œ‰Šú‰»
+	}
+
+	SwitchMove = 0;
+	Frame = 0;
+
+	for (int i = 0; i < 5; i++)
+	{
+		DangoHandle[i] = 0;
+	}
+
+	DangoIndex = 0;
+
+	DangoPosX = 0.0f;
+
+	DangoPosY = 0.0f;
+
+	Gravity = 0.0f;
+
+	BGM = 0;		//BGM‰Šú‰»
+
 	//ƒ‹[ƒvƒŠƒUƒ‹ƒg‚ÖˆÚ“®
 	g_CurrentSceneID = SCENE_ID_LOOP_RESULT;
 }
@@ -13,14 +36,46 @@ void RESULT::Load()
 {
 	//”wŒi‰æ‘œ“Ç‚İ‚İ
 	BackHandle = LoadGraph("Data/Image/Result/BackResult.png");
+
+	//•¶š‰æ‘œ“Ç‚İ‚İ
+	TextHandle[0] = LoadGraph("Data/Image/Result/Result.png");
+	TextHandle[1] = LoadGraph("Data/Image/Result/Back.png");
+
+	DangoHandle[0] = LoadGraph("Data/Image/Play/Dango/Dango1.png");	//Šî–{F
+	DangoHandle[1] = LoadGraph("Data/Image/Play/Dango/Dango2.png");	//ÔF
+	DangoHandle[2] = LoadGraph("Data/Image/Play/Dango/Dango3.png");	//‰©F
+	DangoHandle[3] = LoadGraph("Data/Image/Play/Dango/Dango4.png");	//—ÎF
+	DangoHandle[4] = LoadGraph("Data/Image/Play/Dango/Dango5.png");	//ÂF
+
+	DangoIndex = GetRand(4);
+
+	DangoPosX = (float)GetRand(800) + 200.0f;
+
+	DangoPosY = -150.0f;
+
+	BGM = LoadSoundMem("Data/Sound/clear.mp3");	//BGM“Ç‚İ‚İ
 }
 void RESULT::Sound()
 {
+	ChangeVolumeSoundMem(255 * 40 / 100, BGM);	//‰¹—Ê’²®
+
+	PlaySoundMem(BGM, DX_PLAYTYPE_BACK, true);	//BGMÄ¶
 }
 
 //’Êíˆ—
 void RESULT::Step()
 {
+	DangoPosY += Gravity;
+	Gravity += 0.1f;
+
+	if (DangoPosY >= 800)
+	{
+		DangoIndex = GetRand(4);
+		DangoPosX = (float)GetRand(800) + 200.0f;
+		DangoPosY = -150.0f;
+		Gravity = 0;
+	}
+
 	//ƒ^ƒCƒgƒ‹ƒV[ƒ“‚Ö‚Ì‘JˆÚ
 	if (IsKeyPush(KEY_INPUT_RETURN))
 	{
@@ -34,13 +89,35 @@ void RESULT::Step()
 //•`‰æˆ—
 void RESULT::Draw()
 {
-	DrawGraph(0, 0, BackHandle, true);	//”wŒi
+	//”wŒi
+	DrawGraph(0, 0, BackHandle, true);
+
+	//’cq
+	DrawRotaGraph((int)DangoPosX, (int)DangoPosY, 1.0f, 0.0f, DangoHandle[DangoIndex], true);
+	
+	//•¶š
+	DrawRotaGraph(640, 250, 1.0f, 0.0f, TextHandle[0], true);
+	DrawRotaGraph(640, 500, 1.0f, 0.0f, TextHandle[1], true);
 }
 
 //Œãˆ—
 void RESULT::Fin()
-{
+{	
 	DeleteGraph(BackHandle);	//”wŒi‰æ‘œ”jŠü
+
+	for (int i = 0; i < 2; i++)
+	{
+		DeleteGraph(TextHandle[i]);	//•¶š‰æ‘œ”jŠü
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		DeleteGraph(DangoHandle[i]);
+	}
+
+	StopSoundMem(BGM);		//BGM’â~
+	DeleteSoundMem(BGM);	//BGM”jŠü
+
 	//ƒ^ƒCƒgƒ‹‰Šú‰»‚ÖˆÚ“®
 	g_CurrentSceneID = SCENE_ID_INIT_TITLE;
 }

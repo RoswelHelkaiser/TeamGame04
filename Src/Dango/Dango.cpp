@@ -9,6 +9,7 @@ void Dango::Init()
 		for (int j = 0; j < DANGO_MAX_NUM; j++)
 		{
 			s_Dango[i][j].Handle= 0;
+			s_Dango[i][j].Color = 0;
 			s_Dango[i][j].PosX = 0.0f;
 			s_Dango[i][j].PosY = 0.0f;
 		}
@@ -20,19 +21,20 @@ void Dango::Init()
 		s_Stick[i].PosX = 0.0f;
 		s_Stick[i].PosY = 0.0f;
 	}
-	//矢印
-	for (int i = 0; i < 2; i++)
-	{
-		s_Arrow[i].Handle = 0;
-		s_Arrow[i].PosX = 0;
-		s_Arrow[i].PosY = 0;
-		s_Arrow[i].isDraw = false;
-		s_Arrow[i].isSelect = false;
-	}
+	//ガイド
+	s_Guide.Handle = 0;
+	s_Guide.PosX = 0.0f;
+	s_Guide.PosY = 0.0f;
+	s_Guide.isDraw = false;
+	//サンプル団子
+	Sample = 0;
 
-	CurrentRow = 0;
-	Y_Index_Top = 0;
-	isReadFile = true;
+	CollectColor = GetRand(4);	//集める団子の色をランダムに指定
+	Match = 0;					//団子の一致数を初期化
+	isClear = false;			//クリアフラグを折る
+	CurrentRow = 0;				//最初は1列目にする
+	CurrentLine = 0;			//最初は1行目にする
+	Sound = 0;					//効果音初期化
 }
 
 //ロード
@@ -43,20 +45,25 @@ void Dango::Load()
 	DangoHandle[2] = LoadGraph(Dango_Path[2]);	//黄色
 	DangoHandle[3] = LoadGraph(Dango_Path[3]);	//緑色
 	DangoHandle[4] = LoadGraph(Dango_Path[4]);	//青色
-	ReadFile();	//ファイル読み込み
 
 	//団子
 	for(int Y_Index = 0; Y_Index < DANGO_MAX_NUM; Y_Index++)
 	{
 		for (int X_Index = 0; X_Index < STICK_MAX_NUM; X_Index++)
 		{
-			int DangoColor = FileReadData[Y_Index][X_Index];
-
+			//色をランダムに設定
+			int DangoColor = GetRand(4);
 			//画像読み込み
 			s_Dango[Y_Index][X_Index].Handle = DangoHandle[DangoColor];
+			//色情報を持たせる
+			s_Dango[Y_Index][X_Index].Color = DangoColor;
 			//座標設定
 			s_Dango[Y_Index][X_Index].PosX = 160.0f * X_Index + 160.0f;
 			s_Dango[Y_Index][X_Index].PosY = 525.0f - 82.0f * Y_Index;
+			if (s_Dango[Y_Index][X_Index].Color == CollectColor)
+			{
+				Match++;
+			}
 		}		
 	}
 	//串
@@ -67,22 +74,29 @@ void Dango::Load()
 		s_Stick[i].PosX = 160.0f * i + 160.0f;
 		s_Stick[i].PosY = 360.0f;
 	}
-	//矢印
-	for (int i = 0; i < 2; i++)
-	{
-		s_Arrow[0].Handle = LoadGraph("Data/Image/Play/Arrow1.png");	//赤色
-		s_Arrow[1].Handle = LoadGraph("Data/Image/Play/Arrow2.png");	//黄色
-		s_Arrow[i].PosX = 160;
-		s_Arrow[i].PosY = 45;
-		s_Arrow[0].isDraw = true;
-		s_Arrow[1].isDraw = false;
-	}
+	//ガイド
+	s_Guide.Handle = LoadGraph("Data/Image/Play/Guide.png");	
+	s_Guide.PosX = 160.0f;
+	s_Guide.PosY = 525.0f;
+	s_Guide.isDraw = true;
+	//サンプル団子
+	Sample = DangoHandle[CollectColor];
+	Sound = LoadSoundMem("Data/Sound/change.wav");
 }
 
 //通常処理
 void Dango::Step()
 {
-	Select();	//選択
+	if (!isClear)
+	{
+		Select();	//選択
+	}
+
+	//全ての団子の色が揃ったら	
+	if (Match == DANGO_MAX_NUM * STICK_MAX_NUM)
+	{
+		isClear = true;		//クリアフラグを立てる
+	}
 }
 
 //描画処理
@@ -101,15 +115,14 @@ void Dango::Draw()
 			DrawRotaGraph((int)s_Dango[Y_Index][X_Index].PosX, (int)s_Dango[Y_Index][X_Index].PosY, 1.0f, 0.0f, s_Dango[Y_Index][X_Index].Handle, true);
 		}
 	}
-	//矢印
-	for (int i = 0; i < 2; i++)
+	//ガイド
+	//描画フラグがtrueなら
+	if (s_Guide.isDraw)
 	{
-		//描画フラグがtrueなら
-		if (s_Arrow[i].isDraw)
-		{
-			DrawRotaGraph(s_Arrow[i].PosX, s_Arrow[i].PosY, 1.0f, 0.0f, s_Arrow[i].Handle, true);
-		}
+		DrawRotaGraph((int)s_Guide.PosX, (int)s_Guide.PosY, 1.0f, 0.0f, s_Guide.Handle, true);
 	}
+	//サンプル団子
+	DrawRotaGraph(510, 675, 0.5f, 0.0f, Sample, true);
 }
 
 //後処理
@@ -136,46 +149,12 @@ void Dango::Fin()
 	{
 		DeleteGraph(s_Stick[i].Handle);
 	}
-	//矢印画像破棄
-	for (int i = 0; i < 2; i++)
-	{
-		DeleteGraph(s_Arrow[i].Handle);
-	}
-}
-
-//ファイル読み込み
-void Dango::ReadFile()
-{
-	FILE* fp;
-	fopen_s(&fp, "Data/csv/Pattern1.csv", "r");
-
-	int DangoIndexX = 0;
-	int DangoIndexY = 0;
-
-	while (true)
-	{
-		//数値部分を読み込む
-		fscanf_s(fp, "%d", &FileReadData[DangoIndexY][DangoIndexX]);
-		DangoIndexX++;
-
-		//「,」を飛ばすために読み込みを実行
-		char chara = fgetc(fp);
-
-		//EOFの場合は読み込み終了
-		if (chara == EOF)
-		{
-			break;
-		}
-
-		//改行コードの場合は保存先を変更する
-		if (chara == '\n')
-		{
-			DangoIndexX = 0;
-			DangoIndexY++;
-		}
-	}
-
-	fclose(fp);
+	//ガイド画像破棄
+	DeleteGraph(s_Guide.Handle);
+	//サンプル団子画像破棄
+	DeleteGraph(Sample);
+	StopSoundMem(Sound);
+	DeleteSoundMem(Sound);
 }
 
 //選択
@@ -184,122 +163,92 @@ void Dango::Select()
 	//右キーが押されたら
 	if (IsKeyPush(KEY_INPUT_RIGHT))
 	{
-		CurrentRow++;
+		CurrentRow++;	//次の列に移動
+	
+		s_Guide.PosX += 160.0f;	//ガイドを右に動かす
 
-		//矢印の情報を先頭から順番に回す
-		for (int i = 0; i < 2; i++)
+		//右端まで到達したら
+		if (s_Guide.PosX >= 1120.0f)
 		{
-			//選択フラグがfalseなら
-			if (!s_Arrow[i].isSelect)
-			{
-				s_Arrow[i].PosX += 160;	//矢印を右に動かす
-
-				//右端まで到達したら
-				if (s_Arrow[i].PosX >= 1120)
-				{
-					//それ以上進まないようにする
-					s_Arrow[i].PosX = 1120;
-					CurrentRow = 6;
-				}
-			}
-		}
+			//それ以上進まないようにする
+			s_Guide.PosX = 1120.0f;
+			CurrentRow = 6;
+		}		
 	}
 
 	//左キーが押されたら
 	else if (IsKeyPush(KEY_INPUT_LEFT))
 	{
-		CurrentRow--;
+		CurrentRow--;	//前の列に移動
 
-		//矢印の情報を先頭から順番に回す
-		for (int i = 0; i < 2; i++)
+		s_Guide.PosX -= 160.0f;	//ガイドを左に動かす
+
+		//左端まで到達したら
+		if (s_Guide.PosX <= 160.0f)
 		{
-			//選択フラグがfalseなら
-			if (!s_Arrow[i].isSelect)
-			{
-				s_Arrow[i].PosX -= 160;	//矢印を左に動かす
-
-				//左端まで到達したら
-				if (s_Arrow[i].PosX <= 160)
-				{
-					//それ以上進まないようにする
-					s_Arrow[i].PosX = 160;
-					CurrentRow = 0;
-				}
-			}
+			//それ以上進まないようにする
+			s_Guide.PosX = 160.0f;
+			CurrentRow = 0;
 		}
 	}
 
-	//矢印の情報を先頭から順番に回す
-	for (int i = 0; i < 2; i++)
+	//下キーが押されたら
+	if (IsKeyPush(KEY_INPUT_DOWN))
 	{
-		//エンターキーが押されたら
-		if (IsKeyPush(KEY_INPUT_RETURN))
-		{
-			//どちらの矢印も選択フラグがfalseなら
-			if (!s_Arrow[i].isSelect)
-			{
-				s_Arrow[0].isSelect = true;		//赤色の矢印の選択フラグを立てる
-				s_Arrow[1].isSelect = false;	//黄色の矢印の選択フラグを折る
-				s_Arrow[1].PosX = 160;			//黄色の矢印のX座標を左端にする
-				s_Arrow[1].isDraw = true;		//黄色の矢印の描画フラグを立てる
-				PickUp();	//団子選択
-				CurrentRow = 0;
-			}
+		CurrentLine--;	//下の行に移動
+		
+		s_Guide.PosY += 82.0f;	//ガイドを下に動かす
 
-			//赤色の矢印だけ選択フラグがtrueなら
-			else if (s_Arrow[0].isSelect && !s_Arrow[1].isSelect)
-			{
-				s_Arrow[1].isDraw = false;		//黄色の矢印の描画フラグを折る
-				s_Arrow[1].isSelect = true;		//黄色の矢印の選択フラグを立てる
-				s_Arrow[0].PosX = 160;			//赤色の矢印のX座標を左端にする
-				s_Arrow[0].isSelect = false;	//赤色の矢印の選択フラグを折る
-				Move();		//団子移動
-				Compare();	//正誤判定
-				CurrentRow = 0;
-			}
+		//下端まで到達したら
+		if (s_Guide.PosY >= 525.0f)
+		{
+			//それ以上進まないようにする
+			s_Guide.PosY = 525.0f;
+			CurrentLine = 0;
+		}		
+	}
+
+	//上キーが押されたら
+	else if (IsKeyPush(KEY_INPUT_UP))
+	{
+		CurrentLine++;	//上の行に移動
+
+		s_Guide.PosY -= 82.0f;	//ガイドを上に動かす
+
+		//上端まで到達したら
+		if (s_Guide.PosY <= 196.0f)
+		{
+			//それ以上進まないようにする
+			s_Guide.PosY = 196.0f;
+			CurrentLine = 4;
 		}
 	}
-}
 
-//団子選択
-void Dango::PickUp()
-{
-	//団子
-	for (int Y_Index = 0; Y_Index < DANGO_MAX_NUM; Y_Index++)
+	//エンターキーが押されたら
+	if (IsKeyPush(KEY_INPUT_RETURN))
 	{
-		if (FileReadData[Y_Index][CurrentRow] == 5)
+		ChangeVolumeSoundMem(255 * 55 / 100, Sound);
+		PlaySoundMem(Sound, DX_PLAYTYPE_BACK, true);
+
+		int CurrentColor = s_Dango[CurrentLine][CurrentRow].Color;	//選択中の団子の色を取得
+		//指定された色の団子だったら
+		if (s_Dango[CurrentLine][CurrentRow].Color == CollectColor)
 		{
-			Y_Index_Top = Y_Index - 1;	//ひとつ前のインデックスを一番上として代入
-			break;
+			Match--;	//正解数を減らす
 		}
-	}
-	s_Dango[Y_Index_Top][CurrentRow].isSelect = true;
-	PreRow = CurrentRow;
-}
-
-//団子移動
-void Dango::Move()
-{
-	//団子情報を先頭から回す
-	for (int Y_Index = 0; Y_Index < DANGO_MAX_NUM; Y_Index++)
-	{
-		if (FileReadData[Y_Index][CurrentRow] == 5)
+		int NextColor = CurrentColor + 1;	//次の色用の変数を用意
+		//色情報が最後まで到達したら
+		if (NextColor >= DANGO_NUM)
 		{
-			s_Dango[Y_Index][CurrentRow].PosX = s_Dango[Y_Index_Top][PreRow].PosX;
+			//最初の色に戻す
+			NextColor = 0;
 		}
-	}
-}
-
-//色が揃っているか判定
-void Dango::Compare()
-{
-	//団子情報を先頭から回す
-	for (int Y_Index = 0; Y_Index < 4; Y_Index++)
-	{
-		if (s_Dango[Y_Index][CurrentRow].Handle == s_Dango[Y_Index_Top][CurrentRow].Handle)
+		s_Dango[CurrentLine][CurrentRow].Handle = DangoHandle[NextColor];	//変数を画像ハンドルに代入
+		s_Dango[CurrentLine][CurrentRow].Color = NextColor;		//色情報を更新
+		//更新後の色が指定された色なら
+		if (s_Dango[CurrentLine][CurrentRow].Color == CollectColor)
 		{
-			CurrentScore++;
-			break;
+			Match++;	//正解数を増やす
 		}
 	}
 }

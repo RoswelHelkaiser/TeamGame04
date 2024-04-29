@@ -7,8 +7,19 @@ class PLAY : public SCENE_BASE
 {
 	private:
 		int m_numhndl;
-		int BackHandle;	//背景画像ハンドル
-		Dango m_cDango;	//団子クラス
+		int BackHandle[2];	//背景画像ハンドル
+		int PosY[2];		//背景のY座標
+		int TextHandle[2];	//文字画像ハンドル
+		int TextPosY[2];	//文字のY座標
+		int SwitchMove;		//文字の上昇下降
+		bool isDraw;		//文字描画フラグ
+		int Fade;			//透明度
+		int BGM;			//BGMハンドル
+		int SE;				//効果音
+		bool isSE;			//効果音を鳴らすフラグ
+		int Frame;			//フレーム
+		int Count;			//カウント
+		Dango m_cDango;		//団子クラス
 
 	public:
 		//初期化

@@ -29,6 +29,7 @@ const char Dango_Path[DANGO_NUM][100]
 struct SDango
 {
 	int Handle;	//画像ハンドル
+	int Color;	//団子の色
 	float PosX, PosY;	//X座標,Y座標
 	bool isSelect;		//選択フラグ
 };
@@ -44,9 +45,8 @@ struct SStick
 struct SArrow
 {
 	int Handle;			//画像ハンドル
-	int PosX, PosY;		//X座標,Y座標
+	float PosX, PosY;	//X座標,Y座標
 	bool isDraw;		//描画フラグ
-	bool isSelect;		//選択フラグ
 };
 
 //団子クラス
@@ -55,16 +55,19 @@ class Dango
 	private:
 		SDango s_Dango[DANGO_MAX_NUM][STICK_MAX_NUM];	//団子情報構造体
 		SStick s_Stick[STICK_MAX_NUM];	//串情報構造体
-		SArrow s_Arrow[2];				//矢印情報構造体
+		SArrow s_Guide;					//ガイド情報構造体
 		int FileReadData[DANGO_MAX_NUM][STICK_MAX_NUM] = { 0 };	//ファイルからのデータ
+		int Sample;						//サンプル団子画像ハンドル
 		int DangoHandle[DANGO_NUM];		//団子画像ハンドル(読み込み用)
-		bool isReadFile;	//ファイル読み込みフラグ
-		int CurrentRow;		//何番目の串を選んでいるか
-		int PreRow;			//ひとつ前の列情報
-		int Y_Index_Top;	//一番上の団子のインデックス
-		int CurrentScore;	//正解数
-
+		int CollectColor;	//集める団子の色
+		int Match;			//一致している団子の数
+		int CurrentRow;		//選択中の列
+		int CurrentLine;	//選択中の行
+		int Sound;			//効果音
+		
 	public:
+		bool isClear;	//クリアフラグ
+
 		//初期化
 		void Init();
 		//ロード
@@ -75,14 +78,6 @@ class Dango
 		void Draw();
 		//後処理
 		void Fin();
-		//ファイル読み込み
-		void ReadFile();
 		//選択
 		void Select();
-		//団子選択
-		void PickUp();
-		//団子移動
-		void Move();
-		//色が揃っているか判定
-		void Compare();
 };
